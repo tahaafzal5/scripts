@@ -39,7 +39,7 @@ perform_backup() {
 
     for sourceDir in "${sourceDirs[@]}"; do
         echo "Backing up $baseDir$sourceDir..."
-        rsync -azvPch --delete --exclude 'TV' --exclude '*.imovielibrary' --exclude '*.photoslibrary' \
+        rsync -azvPh --delete --exclude 'TV' --exclude '*.imovielibrary' --exclude '*.photoslibrary' \
               --exclude '*.theater' "$baseDir$sourceDir" "$destination"
     done
 }
