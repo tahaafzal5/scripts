@@ -47,6 +47,7 @@ perform_backup() {
 }
 
 # Main execution
+echo "Script ran at: $(date)"
 validate_args "$@"
 
 echo "Testing SSH connection to Raspberry Pi..."
