@@ -39,7 +39,7 @@ fi
 check_flash_drive_mounted $1
 perform_backup $1
 unmount_flash_drive $1
+status=$?
 
-# Print exit status
-echo "Backup completed with exit status $?"
-exit 0
+echo "Backup completed with exit status $status"
+exit $status
