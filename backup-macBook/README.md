@@ -11,6 +11,7 @@ $ backupMacBookToFlashDrive.sh <name of the drive>
 
 ### Format as exFAT
 ```
+$ diskutil list # to identify the disk name
 $ diskutil unmountDisk /dev/<disk-name>
 $ diskutil eraseDisk exFAT <new name of disk> /dev/<disk-name>
 ```
