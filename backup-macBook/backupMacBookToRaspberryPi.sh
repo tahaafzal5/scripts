@@ -11,6 +11,35 @@ PI_HOST="raspberrypi"
 USB_NAME=""
 PI_USB_MOUNT=""
 DESTINATION=""
+DISPLAY_SLEEP_TIME=""
+POWER_SOURCE=""
+
+# Function to save and set display sleep time based on power source
+set_display_sleep_time() {
+    DISPLAY_SLEEP_TIME=$(pmset -g | grep " displaysleep" | awk '{print $2}')
+    POWER_SOURCE=$(pmset -g batt | grep "Now drawing from" | awk '{print $4}' | tr -d "'")
+
+    if [ $POWER_SOURCE = "AC" ]; then
+        echo "MacBook is currently charging."
+        sudo pmset -c displaysleep 0
+        echo "displaysleep set to 0 for AC power."
+    else
+        echo "MacBook is currently on battey power."
+        sudo pmset -b displaysleep 0
+        echo "displaysleep set to 0 for battery power."
+    fi
+}
+
+# Function to restore display sleep time settings
+restore_display_sleep_time() {
+    if [ $POWER_SOURCE = "AC" ]; then
+        sudo pmset -c displaysleep $DISPLAY_SLEEP_TIME
+        echo "displaysleep set to $DISPLAY_SLEEP_TIME for AC power."
+    else
+        sudo pmset -b displaysleep $DISPLAY_SLEEP_TIME
+        echo "displaysleep set to $DISPLAY_SLEEP_TIME for battery power."
+    fi
+}
 
 # Function to validate arguments
 validate_args() {
@@ -25,7 +54,6 @@ validate_args() {
 
 # Function to check if Raspberry Pi USB is mounted
 check_usb_mounted_on_pi() {
-    echo "Checking if USB '$USB_NAME' is mounted on Raspberry Pi..."
     ssh "$PI_USER@$PI_HOST" "mount | grep -q '$PI_USB_MOUNT'" || {
         echo "USB drive '$USB_NAME' not mounted at $PI_USB_MOUNT on Raspberry Pi."
         exit 1
@@ -57,7 +85,10 @@ if ! ssh -o ConnectTimeout=5 "$PI_USER@$PI_HOST" 'echo Connection successful'; t
 fi
 
 check_usb_mounted_on_pi
+set_display_sleep_time
 perform_backup
+restore_display_sleep_time
+
 status=$?
 
 echo "Backup completed with exit status $status"
