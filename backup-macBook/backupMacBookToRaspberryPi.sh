@@ -68,9 +68,15 @@ perform_backup() {
 
     for sourceDir in "${sourceDirs[@]}"; do
         echo "Backing up $baseDir$sourceDir to Raspberry Pi..."
-        rsync -azh --info=progress2 --delete --exclude 'TV' --exclude '*.imovielibrary' \
-              --exclude '*.photoslibrary' --exclude '*.theater' \
-              "$baseDir$sourceDir" "$DESTINATION"
+
+        if [ "$sourceDir" = "Pictures" ]; then
+            # Backup Pictures without --delete flag
+            rsync -azh --info=progress2 --exclude '*.photoslibrary' \
+                  "$baseDir$sourceDir" "$DESTINATION"
+        else
+            rsync -azh --info=progress2 --delete --exclude 'TV' --exclude '*.imovielibrary' \
+                    --exclude '*.theater' "$baseDir$sourceDir" "$DESTINATION"
+        fi
     done
 }
 
