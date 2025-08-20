@@ -1,15 +1,11 @@
 #!/bin/zsh
 
-# Purpose: Backup MacBook to USB on Raspberry Pi via SSH
-# Usage: ./backupMacBookToRaspberryPi.sh <usb-name>
-
-# Raspberry Pi details
-PI_USER="taha"
-PI_HOST="raspberrypi"
+# Purpose: Backup MacBook to local USB drive
+# Usage: ./backupMacBookToUSB.sh <usb-name>
 
 # Globals
 USB_NAME=""
-PI_USB_MOUNT=""
+USB_MOUNT="/Volumes"
 DESTINATION=""
 DISPLAY_SLEEP_TIME=""
 POWER_SOURCE=""
@@ -48,17 +44,16 @@ validate_args() {
         exit 1
     fi
     USB_NAME=$1
-    PI_USB_MOUNT="/media/$PI_USER/$USB_NAME"
-    DESTINATION="$PI_USER@$PI_HOST:$PI_USB_MOUNT"
+    DESTINATION="$USB_MOUNT/$USB_NAME"
 }
 
-# Function to check if Raspberry Pi USB is mounted
-check_usb_mounted_on_pi() {
-    ssh "$PI_USER@$PI_HOST" "mount | grep -q '$PI_USB_MOUNT'" || {
-        echo "USB drive '$USB_NAME' not mounted at $PI_USB_MOUNT on Raspberry Pi."
+# Function to check if USB is mounted
+check_usb_mounted() {
+    if [ ! -d "$DESTINATION" ]; then
+        echo "USB drive '$USB_NAME' not mounted at $DESTINATION"
         exit 1
-    }
-    echo "USB drive '$USB_NAME' is mounted."
+    fi
+    echo "USB drive '$USB_NAME' is mounted at $DESTINATION"
 }
 
 # Function to perform the backup
@@ -67,7 +62,7 @@ perform_backup() {
     sourceDirs=("swdev" "Desktop" "Downloads" "Documents" "Movies" "Movies/TV Series" "Pictures")
 
     for sourceDir in "${sourceDirs[@]}"; do
-        echo "Backing up $baseDir$sourceDir to Raspberry Pi..."
+        echo "Backing up $baseDir$sourceDir to USB drive..."
 
         if [ "$sourceDir" = "Pictures" ]; then
             # Backup Pictures without --delete flag
@@ -83,14 +78,7 @@ perform_backup() {
 # Main execution
 echo "Script ran at: $(date)"
 validate_args "$@"
-
-echo "Testing SSH connection to Raspberry Pi..."
-if ! ssh -o ConnectTimeout=5 "$PI_USER@$PI_HOST" 'echo Connection successful'; then
-    echo "Cannot connect to Raspberry Pi. Please check network and SSH access."
-    exit 1
-fi
-
-check_usb_mounted_on_pi
+check_usb_mounted
 set_display_sleep_time
 perform_backup
 restore_display_sleep_time
