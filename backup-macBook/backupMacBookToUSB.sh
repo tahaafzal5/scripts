@@ -64,13 +64,12 @@ perform_backup() {
     for sourceDir in "${sourceDirs[@]}"; do
         echo "Backing up $baseDir$sourceDir to USB drive..."
 
-        if [ "$sourceDir" = "Pictures" ]; then
-            # Backup Pictures without --delete flag
-            rsync -azh --info=progress2 --exclude '*.photoslibrary' \
+        if [ "$sourceDir" = "Movies" ] || [ "$sourceDir" = "Movies/TV Series" ] || [ "$sourceDir" = "Pictures" ]; then
+            # Backup these directories without the --delete flag
+            rsync -azh --info=progress2 --exclude 'TV' --exclude '*.imovielibrary' --exclude '*.photoslibrary' --exclude '*.theater' \
                   "$baseDir$sourceDir" "$DESTINATION"
         else
-            rsync -azh --info=progress2 --delete --exclude 'TV' --exclude '*.imovielibrary' \
-                    --exclude '*.theater' "$baseDir$sourceDir" "$DESTINATION"
+            rsync -azh --info=progress2 --delete "$baseDir$sourceDir" "$DESTINATION"
         fi
     done
 }
