@@ -59,15 +59,14 @@ check_usb_mounted() {
 # Function to perform the backup
 perform_backup() {
     baseDir="/Users/tahaafzal/"
-    sourceDirs=("swdev" "Desktop" "Downloads" "Documents" "Movies" "Movies/TV Series" "Pictures")
+    sourceDirs=("swdev" "Desktop" "Downloads" "Documents" "Pictures")
 
     for sourceDir in "${sourceDirs[@]}"; do
         echo "Backing up $baseDir$sourceDir to USB drive..."
 
-        if [ "$sourceDir" = "Movies" ] || [ "$sourceDir" = "Movies/TV Series" ] || [ "$sourceDir" = "Pictures" ]; then
+        if [ "$sourceDir" = "Pictures" ]; then
             # Backup these directories without the --delete flag
-            rsync -azh --info=progress2 --exclude 'TV' --exclude '*.imovielibrary' --exclude '*.photoslibrary' --exclude '*.theater' \
-                  "$baseDir$sourceDir" "$DESTINATION"
+            rsync -azh --info=progress2 --exclude '*.photoslibrary' "$baseDir$sourceDir" "$DESTINATION"
         else
             rsync -azh --info=progress2 --delete "$baseDir$sourceDir" "$DESTINATION"
         fi
