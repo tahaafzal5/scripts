@@ -44,7 +44,7 @@ validate_args() {
         exit 1
     fi
     USB_NAME=$1
-    DESTINATION="$USB_MOUNT/$USB_NAME"
+    DESTINATION="$USB_MOUNT/$USB_NAME/Backup"
 }
 
 # Function to check if USB is mounted
